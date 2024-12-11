@@ -31,6 +31,14 @@ typedef enum{
     NB_OPTIONS
 }menu_e;
 
+typedef enum{
+    V_TEXT,
+    VOL,
+    EXIT_SETTINGS,
+
+    NB_SETTINGS
+}settings_e;
+
 typedef struct{
     char nom[MAX_INPUT];
     int option;
@@ -120,6 +128,9 @@ class Princesse : public Personnage{
             cout << "Faiblesse:" << faiblesse << endl;
             cout << "Etat:" << etat << endl;
         }
+        // void uniea(Princeroi p){}
+        // void proteger(Fee f){}
+        // void attackrPar(Sorciere s){}
 };
 
 class Princeroi : public Personnage{
@@ -156,7 +167,9 @@ class Princeroi : public Personnage{
             cout << "Etat civil: " << etatCivil << endl << endl;
         }
 
-        int attaque(Personnage p){return p.getVie() - map_armes[getArme()].points;}
+        int attack(Personnage p){return p.getVie() - map_armes[getArme()].points;}
+        // void sauve(Princesse p, int nbPoint){}
+        // void heal(){if(getVie() <= 50){ (getVie() + 50); }}
 };
 
 class Monstre : public Personnage{
@@ -177,7 +190,7 @@ class Monstre : public Personnage{
         void setForce(int f){force = f;}
         void setGentil(bool g){gentil = g;}
         // Methods
-        int attaque(Personnage p){
+        int attack(Personnage p){
             return p.getVie() - (force * map_armes[getArme()].points);
         }
 
@@ -194,6 +207,38 @@ class Monstre : public Personnage{
             cout << "Force: " << getForce() << endl;
             cout << "Gentil: " << getGentil() << endl;
         }
+
+        // void appartient(Personnage p){}
+};
+
+class Magique : public Personnage{
+    private:
+        char specialite[MAX_INPUT];
+    public:
+        char* getSpecialite(){return specialite;}
+        void setSpecialite(const char s[MAX_INPUT]){strcpy(specialite, s);}
+};
+
+class Sorciere : public Magique{
+    private:
+        char couleurMagie[MAX_INPUT];
+    public:
+        char* getCouleurMagie(){return couleurMagie;}
+        void setCouleurMagie(const char cm[MAX_INPUT]){strcpy(couleurMagie, cm);}
+        // void deteste(Princesse p){}
+        // void attack(Princesse p){}
+        // void getSorciere(){}
+};
+
+class Fee : public Magique{
+    private:
+        char famille[MAX_INPUT];
+    public:
+        char* getFamille(){return famille;}
+        void setFamille(const char f[MAX_INPUT]){strcpy(famille, f);}
+        // void aime(Princesse p){}
+        // void aide(Princesse p){}
+        // void getFee(){}
 };
 
 #endif // MODELE_H

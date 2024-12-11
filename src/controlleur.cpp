@@ -5,6 +5,7 @@
 #include "modele.h"
 #include "vue.h"
 
+
 using namespace std;
 
 // Fonctions privees
@@ -13,7 +14,8 @@ Princeroi selectionPrinceroi(){
     int selectionId = choixPrinceroi();
     cout << selectionId << endl;
     Princeroi princeroi(selectionId);
-    if(estPrinceroiConfirmer(princeroi))
+    princeroi.getPrinceroi();
+    if(estChoixConfirmer())
         return princeroi;
     }
 }
@@ -46,16 +48,16 @@ void initYipee(Monstre& yipee){
 
 bool isFightWon(Princeroi p, Monstre m){
     while(p.getVie() > 0 && m.getVie() > 0){
-        m.setVie(p.attaque(m));
-        cout << p.getNom() << " attaque " << m.getNom() << " avec ";
+        m.setVie(p.attack(m));
+        cout << p.getNom() << " attack " << m.getNom() << " avec ";
         cout << map_armes[p.getArme()].type << " faisant ";
         cout << map_armes[p.getArme()].points << " degats." << endl;
         cout << "Il reste au monstre: " << m.getVie() << "HP" << endl << endl;
         usleep(500000);
 
         if(m.getVie() > 0){
-            p.setVie(m.attaque(p));
-            cout << m.getNom() << " attaque " << p.getNom() << " avec ";
+            p.setVie(m.attack(p));
+            cout << m.getNom() << " attack " << p.getNom() << " avec ";
             cout << map_armes[m.getArme()].type << " faisant ";
             cout << m.getForce() * map_armes[m.getArme()].points << " degats." << endl;
             cout << "Il reste au hero: " << p.getVie() << "HP" << endl << endl;
@@ -73,50 +75,71 @@ bool isFightWon(Princeroi p, Monstre m){
     }
 }
 
-void debutAventure(){
+void debutAventure(int wait){
     Princeroi hero = selectionPrinceroi();
     cout << "Welcome, " << hero.getNom() << ", " << hero.getConte() << endl;
-    story1();
-    story2();
-    story3();
-    cout << "Appuye sur espace pour continuer..." << endl;
+    story1(wait);
+    story2(wait);
+    story3(wait);
+    waitForEnter();
 
     // Fight vs Warior
     Monstre warior;
     initWarior(warior);
     cout << "Un Warior sauvage apparait et vous lache une caisse!" << endl;
-    usleep(1000000);
+    usleep(wait);
     cout << "Mecreant, vous ne pouvez point laisser cela passer" << endl;
-    usleep(1000000);
+    usleep(wait);
     cout << "[insert epic battle music]" << endl << endl;
+    waitForEnter();
     if(!isFightWon(hero, warior))
         return;
     cout << "Bravo, allez voir Peach pour une belle recompense" << endl;
-    dots();
+    dots(wait);
     cout << "Ah merde!" << endl << "Bon vas sauvez Bowser... euh peach" << endl;
-    usleep(2000000);
+    usleep(wait);
+    waitForEnter();
 
     // Fight vs Yipee
     Monstre yipee;
     initYipee(yipee);
     cout << "Tu scrutine le boisson devant toi..." << endl;
-    usleep(1000000);
-    cout << "Le boisson bouge, un goomba serait encore en vie?" << endl;
-    usleep(1000000);
+    usleep(wait);
+    cout << "Le buisson bouge, un goomba serait encore en vie?" << endl;
+    usleep(wait);
     cout << "SAUTE DESSUS!" << endl << "[insert epic battle music]" << endl;
-    usleep(1000000);
+    usleep(wait);
+    waitForEnter();
     if(!isFightWon(hero, yipee))
         return;
     cout << "SAUVAGE ! TU DOIS TOUT TUER SUR TON CHEMIN OU QUOI???" << endl;
-    usleep(2000000);
+    usleep(wait);
     cout << "Le pauvre yipee... nos seul ami... mort" << endl;
-    dots();
+    dots(wait);
     cout << "DE TES MAINS, TES MAINS ENSENGLENTEES!" << endl;
-    usleep(2000000);
+    usleep(wait);
     cout << "Tu n'entendras plus de yipee, tu ne verras plus de yipee" << endl;
-    usleep(1000000);
+    usleep(wait);
     cout << "Continue donc ton pauvre chemin" << endl << endl;
-    usleep(1000000);
+    usleep(wait);
+    waitForEnter();
+}
+
+void settings(int* wait){
+    int choix = settingsMenu();
+    switch(choix){
+        case V_TEXT:
+            *wait = changeTextSpeed();
+            break;
+        case VOL:
+            cout << "Pour plus tard" << endl;
+            break;
+        case EXIT_SETTINGS:
+            return;
+        default:
+            cout << "Entree invalide, reesayer" << endl;
+            break;
+    }
 }
 
 // Fonctions publiques
@@ -126,13 +149,13 @@ void debutAventure(){
 void menu(){
     while(1){
         afficheMainMenu();
-        int choix;
+        int choix, wait;
         cin >> choix;
         switch (choix)
         {
         case START:
             system("clear");
-            debutAventure();
+            debutAventure(wait);
             break;
 
         case LOAD:
@@ -142,7 +165,7 @@ void menu(){
 
         case SETTINGS:
             system("clear");
-            cout << "WIP" << endl;
+            settings(&wait);
             break;
 
         case QUIT:
@@ -150,7 +173,7 @@ void menu(){
             exit(0);
 
         default:
-            cout << "Choix invalide, ressayer";
+            cout << "Choix invalide, ressayer" << endl;
             break;
         }
     }
