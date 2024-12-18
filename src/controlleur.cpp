@@ -165,9 +165,10 @@ bool isFightWon(Princeroi& p, Monstre m, int wait){
             showAttack(m, p, wait);
         }
         else{ // Le monstre est mort
-            cout << m.getNom() << " est mort" << endl;
-            usleep(wait);
             int gainXp = p.getXp() + m.getMaxVie();
+            cout << m.getNom() << " est mort. Tu as gagne ";
+            cout << gainXp << "XP" << endl;
+            usleep(wait);
             p.setXp(gainXp);
             levelUp(p, gainXp, wait);
             return true;
@@ -430,6 +431,9 @@ void initLouloutre(Princeroi& louloutre){
     louloutre.setNom("Louloutre");
     louloutre.setAge(20);
     louloutre.setVie(100);
+    louloutre.setMaxVie(100);
+    louloutre.setMana(100);
+    louloutre.setMaxMana(100);
     louloutre.setConte("Investigateur de bureaux");
     louloutre.setArme(PIPE);
     louloutre.setTitre("Secretaire");

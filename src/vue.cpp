@@ -146,8 +146,8 @@ int fightChoice(){
     int choix;
     ligne();
     cout << "Que faire sur ce tour" << endl;
-    cout << ATTACK << " - Pour attaquer le monstre." << endl;
-    cout << SORT << " - Voir la liste des sorts " << endl;
+    cout << ATTACK << " - Pour attaquer le monstre avec votre arme" << endl;
+    cout << SORT << " - Pour utiliser un sort" << endl;
     ligne();
     cout << "Entrer votre choix: ";
     cin >> choix;
