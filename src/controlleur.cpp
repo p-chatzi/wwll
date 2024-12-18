@@ -99,7 +99,7 @@ void appliqueSort(Sort& sort, Personnage& lanceur, Personnage& cible){
 bool lancerSort(Princeroi& p, Monstre& m){
     while (1) {
         // Selection d'un sort
-        int choix = choixSort();
+        int choix = choixSort(p);
         if(choix >= 0 && choix < NB_SORTS){
             // On affiche les details de ce sort
             Sort sort(choix);

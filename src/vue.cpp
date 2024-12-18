@@ -71,8 +71,9 @@ void afficheMainMenu() {
     cout << "Votre selection: ";
 }
 
-int choixSort() {
+int choixSort(Personnage p) {
     cout << "Veuillez selectionner un sort : " << endl;
+    currentMana(p);
     ligne();
     cout << "Retour en arriere : " << GO_BACK << endl << endl;
     cout << "Sorts offensif :" << endl;

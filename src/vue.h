@@ -19,7 +19,7 @@ void afficheMainMenu();
 
 // Choix
 int choixPrinceroi();
-int choixSort();
+int choixSort(Personnage p);
 int fightChoice();
 bool estChoixConfirmer();
 int changeTextSpeed();
