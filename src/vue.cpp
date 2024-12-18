@@ -21,6 +21,11 @@ void waitForEnter(){
     cin.get();
 }
 
+/*
+    Permet au joueur de changer la vitesse
+    a laquelle le texte vas se derouler.
+    Accessible via le menu de parametres
+*/
 int changeTextSpeed(){
     int wait;
     cout << "Changer la vitesse de texte" << endl;
@@ -31,6 +36,11 @@ int changeTextSpeed(){
     return wait;
 }
 
+/*
+    Affiche des informations sur l'armes choisit
+    Eg. verifier quelle arme on as sur nous,
+    ou verifier l'arme que l'on veut acheter etc...
+ */
 void afficherArmeActuelle(Personnage p, arme_s a) {
     cout << endl;
     cout << "L'arme actuelle de " << p.getNom() << endl;
@@ -40,11 +50,12 @@ void afficherArmeActuelle(Personnage p, arme_s a) {
     cout << endl;
 }
 
+/*
+    Affiche les informations sur toutes les armes existantes
+*/
 void listeArmes() {
     for(int i = 0; i < NB_ARMES; i++) {
         cout << map_armes[i].type << endl;
-        // On peut utiliser i pour l'id ci-dessous
-        // Mais je prefere m'assurer que le num est correcte
         cout << "id: " << map_armes[i].num << endl;
         cout << "Degats: " << map_armes[i].points << endl;
     }
@@ -58,6 +69,33 @@ void afficheMainMenu() {
     }
     ligne();
     cout << "Votre selection: ";
+}
+
+int choixSort() {
+    cout << "Veuillez selectionner un sort : " << endl;
+    ligne();
+    cout << "Retour en arriere : " << GO_BACK << endl << endl;
+    cout << "Sorts offensif :" << endl;
+    cout << RASSENGAN << " - Rassengan" << endl;
+    cout << ECLAIR << " - Eclair" << endl;
+    cout << EXPLOSION << " - Explosion" << endl;
+    cout << NO_NOOB << " - No noob" << endl;
+    cout << NO_JOHNS << " - No johns" << endl;
+
+    cout << endl << "Sorts de buff : " << endl;
+    cout << PROTECTION_DIVINE << " - Protection divine" << endl;
+    
+    cout << endl << "Sorts de debuff : " << endl;
+    cout << DISPEL << " - Dispel" << endl;
+    cout << SILENCE << " - Silence" << endl;
+    
+    cout << endl << "Sorts de soin : " << endl;
+    cout << BAUME_APPAISANT << " - Baume appaisant" << endl;
+    ligne();
+    cout << "Votre choix: ";
+    int choix;
+    cin >> choix;
+    return choix;
 }
 
 int choixPrinceroi() {
@@ -81,14 +119,13 @@ bool estChoixConfirmer() {
     cout << "Valider vous votre choix?" << endl;
     cout << "0 - Oui" << endl;
     cout << "1 - Non" << endl;
+    
     int choix;
     cout << "Votre choix: ";
     cin >> choix;
     cout << endl;
-    if(choix == 0)
-        return true;
-    else
-        return false;
+
+    return choix == 0;
 }
 
 int settingsMenu(){
@@ -102,6 +139,52 @@ int settingsMenu(){
     cout << "Entrer votre choix: ";
     cin >> choix;
     return choix;
+}
+
+int fightChoice(){
+    int choix;
+    ligne();
+    cout << "Que faire sur ce tour" << endl;
+    cout << ATTACK << " - Pour attaquer le monstre." << endl;
+    cout << SORT << " - Voir la liste des sorts " << endl;
+    ligne();
+    cout << "Entrer votre choix: ";
+    cin >> choix;
+    return choix;
+}
+
+void showAttack(Personnage p1, Personnage p2, int wait){
+    cout << endl << p1.getNom() << " lance " << map_armes[p1.getArme()].type;
+    cout << " sur " << p2.getNom() << endl << p2.getNom() << " perds "; 
+    cout << map_armes[p1.getArme()].points << "pdv" << endl;
+    // cout << p2.getNom() << " as " << p2.getVie() << "PDV" << endl;
+    cout << endl;
+    usleep(wait);
+}
+
+void showSort(Sort& sort, Personnage lanceur, Personnage cible) {
+    cout << "Le sort " << sort.getNom() << " est lancé sur " << cible.getNom() << "." << endl;
+    if (sort.getType() == OFFENSIF) {
+        cout << "Dégâts infligés: " << sort.getDegat() << endl;
+        // cout << cible.getNom() << " as " << cible.getVie() << "PDV" << endl;
+    } else if (sort.getType() == BUFF) {
+        cout << "Buff défense: " << sort.getBuffDef() << endl;
+        cout << "Buff attaque: " << sort.getBuffAtk() << endl;
+    } else if (sort.getType() == DEBUFF) {
+        cout << "Debuff défense: " << sort.getDebuffDef() << endl;
+        cout << "Debuff attaque: " << sort.getDebuffAtk() << endl;
+    } else if (sort.getType() == SOIN) {
+        cout << "Soin appliqué: " << sort.getSoin() << endl;
+    }
+    cout << endl;
+}
+
+void currentHp(Personnage p){
+    cout << p.getNom() << ": " << p.getVie() << "/" << p.getMaxVie() << " HP - ";
+}
+
+void currentMana(Personnage p){
+    cout << p.getMana() << "/" << p.getMaxMana() <<  " Mana " << endl;
 }
 
 void story1(int wait) {
