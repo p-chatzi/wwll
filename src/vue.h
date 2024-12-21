@@ -1,33 +1,50 @@
 #ifndef VUE_H
 #define VUE_H
 
-#include "modele.h"
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <string>
 
-void waitForEnter();
-void afficherArmeActuelle(Personnage p, arme_s a);
-void showAttack(Personnage p1, Personnage p2, int wait);
-void showSort(Sort& sort, Personnage lanceur, Personnage cible);
-void currentHp(Personnage p);
-void currentMana(Personnage p);
+// Forward declarations
+class Personnage;
+class arme_s;
+class Sort;
+
+void waitForEnter(sf::RenderWindow& window, sf::Font& font);
+void afficherArmeActuelle(sf::RenderWindow& window, sf::Font& font, Personnage p, arme_s a);
+void showAttack(sf::RenderWindow& window, sf::Font& font, Personnage p1, Personnage p2, int wait);
+void showSort(sf::RenderWindow& window, sf::Font& font, Sort& sort, Personnage lanceur, Personnage cible);
+void currentHp(sf::RenderWindow& window, sf::Font& font, Personnage p);
+void currentMana(sf::RenderWindow& window, sf::Font& font, Personnage p);
+void gainXp(sf::RenderWindow& window, sf::Font& font, int xp);
+
+// SFML
+void drawTexts(sf::RenderWindow& window, std::vector<sf::Text>& texts);
+int getUserInput(sf::RenderWindow& window);
+void displayText(sf::RenderWindow& window, const std::string& message, sf::Font& font);
 
 // Liste
-void listeArmes();
+void listeArmes(sf::RenderWindow& window, sf::Font& font);
 
 // Menus
-int settingsMenu();
-void afficheMainMenu();
+int settingsMenu(sf::RenderWindow& window, sf::Font& font);
+void afficheMainMenu(sf::RenderWindow& window);
 
 // Choix
-int choixPrinceroi();
-int choixSort(Personnage p);
-int fightChoice();
-bool estChoixConfirmer();
-int changeTextSpeed();
+int choixPrinceroi(sf::RenderWindow& window, sf::Font& font);
+int choixSort(sf::RenderWindow& window, sf::Font& font, Personnage p);
+int fightChoice(sf::RenderWindow& window, sf::Font& font);
+bool estChoixConfirmer(sf::RenderWindow& window, sf::Font& font);
+int changeTextSpeed(sf::RenderWindow& window, sf::Font& font);
 
 // Lore
-void story1(int wait);
-void story2(int wait);
-void story3(int wait);
-void dots(int wait);
+void story1(sf::RenderWindow& window, int wait);
+void story2(sf::RenderWindow& window, int wait);
+void story3(sf::RenderWindow& window, int wait);
+void dots(sf::RenderWindow& window, sf::Font& font, int wait);
+void beforeWarior(sf::RenderWindow& window, sf::Font& font, int wait);
+void afterWarior(sf::RenderWindow& window, sf::Font& font, int wait);
+void beforeYipee(sf::RenderWindow& window, sf::Font& font, int wait);
+void afterYipee(sf::RenderWindow& window, sf::Font& font, int wait);
 
 #endif // VUE_H

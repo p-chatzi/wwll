@@ -45,7 +45,6 @@ Sort::Sort(int num){
             initBaumeAppaisant(*this);
             break;
         default:
-            cout << "Choix invalide" << endl;
             break;
     }
 }
@@ -72,7 +71,6 @@ Princeroi::Princeroi(int num){
             initChampignouf(*this);
             break;
         default:
-            cout << "Choix invalide" << endl;
             break;
     }
 }

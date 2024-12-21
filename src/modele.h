@@ -3,11 +3,17 @@
 
 #include <iostream>
 #include <cstring>
+#include <SFML/Graphics.hpp>
+#include <cstring>
+#include <string>
+
+#include "vue.h"
+#include "controlleur.h"
 
 using namespace std;
 
 #define MAX_INPUT 100
-#define MAX_TEXT 1000
+#define MAX_TEXT 256
 
 typedef enum{
     MARIOR,
@@ -33,6 +39,7 @@ typedef enum{
     GO_BACK = -1
 }menu_e;
 
+
 typedef enum{
     V_TEXT,
     VOL,
@@ -55,7 +62,7 @@ typedef struct{
 
 extern menu_s map_menu[NB_OPTIONS];
 
-typedef struct{
+typedef struct arme_s{
     char type[MAX_INPUT];
     int num;
     int points;
@@ -132,10 +139,11 @@ class Personnage{
         void setXp(int x){xp = x;}
         void setLevel(int l){level = l;}
     // Methods
-        void changeArme(arme_s& arme, Personnage& p,int choix){
+        void changeArme(arme_s& arme, Personnage& p, int choix, sf::RenderWindow& window, sf::Font& font){
             strcpy(arme.type, map_armes[choix].type);
             arme.num = map_armes[choix].num;
-            arme.points = map_armes[choix].points;
+            std::string displayName = "Votre nouvelle arme: " + std::string(map_armes[choix].type);
+            displayText(window, displayName, font);
             p.setArme(choix);
         }
 };
@@ -152,15 +160,25 @@ class Princesse : public Personnage{
         void setFaiblesse(const char f[MAX_INPUT]){strcpy(faiblesse, f);}
         void setEtat(int e){etat = e;}
         // Methods
-        void getPrincesse(){ // Afficher()
-            cout << "ID/Num: " << getNum() << endl;
-            cout << "Nom: " << getNom() << endl;
-            cout << "Age: " << getAge() << endl;
-            cout << "Vie: " << getVie() << endl;
-            cout << "Conte: " << getConte() << endl;
-            cout << "Arme: " << getArme() << endl;
-            cout << "Faiblesse:" << faiblesse << endl;
-            cout << "Etat:" << etat << endl;
+        void getPrincesse(sf::RenderWindow& window, sf::Font& font){ // Afficher()
+            std::string displayName = "Num: " + std::to_string(getNum()) ;
+            displayText(window, displayName, font);
+            displayName = "Nom: " + std::string(getNom());
+            displayText(window, displayName, font);
+            displayName = "Description: " + std::string(getDescription());
+            displayText(window, displayName, font); 
+            displayName = "Age: " + std::to_string(getAge());
+            displayText(window, displayName, font);
+            displayName = "Vie: " + std::to_string(getVie());
+            displayText(window, displayName, font);
+            displayName = "Conte: " + std::string(getConte());
+            displayText(window, displayName, font); 
+            displayName = "Arme: " + std::to_string(getArme());
+            displayText(window, displayName, font);
+            displayName = "Faiblesse: " + std::string(getFaiblesse());
+            displayText(window, displayName, font);
+            displayName = "Etat: " + std::to_string(getEtat());
+            displayText(window, displayName, font); 
         }
         // void uniea(Princeroi p){}
         // void proteger(Fee f){}
@@ -187,19 +205,29 @@ class Princeroi : public Personnage{
         void setNature(const char n[MAX_INPUT]){strcpy(nature, n);}
         void setEtatCivil(const char ec[MAX_INPUT]){strcpy(etatCivil, ec);}
         // Methods
-        void getPrinceroi(){
-            cout << endl;
-            cout << "ID/Num: " << getNum() << endl;
-            cout << "Nom: " << getNom() << endl;
-            cout << "Description: " << getDescription() << endl;
-            cout << "Age: " << getAge() << endl;
-            cout << "Vie: " << getVie() << endl;
-            cout << "Conte: " << getConte() << endl;
-            cout << "Arme: " << getArme() << endl;
-            cout << "Titre: " << titre << endl;
-            cout << "Tribu: " << tribu << endl;
-            cout << "Nature: " << nature << endl;
-            cout << "Etat civil: " << etatCivil << endl << endl;
+        void getPrinceroi(sf::RenderWindow& window, sf::Font& font){
+            std::string displayName = "Num: " + std::to_string(getNum()) ;
+            displayText(window, displayName, font);
+            displayName = "Nom: " + std::string(getNom());
+            displayText(window, displayName, font);
+            displayName = "Description: " + std::string(getDescription());
+            displayText(window, displayName, font); 
+            displayName = "Age: " + std::to_string(getAge());
+            displayText(window, displayName, font);
+            displayName = "Vie: " + std::to_string(getVie());
+            displayText(window, displayName, font);
+            displayName = "Conte: " + std::string(getConte());
+            displayText(window, displayName, font); 
+            displayName = "Arme: " + std::to_string(getArme());
+            displayText(window, displayName, font);
+            displayName = "Titre: " + std::string(getTitre());
+            displayText(window, displayName, font);
+            displayName = "Tribu: " + std::string(getTribu());
+            displayText(window, displayName, font);
+            displayName = "Nature: " + std::string(getNature());
+            displayText(window, displayName, font); 
+            displayName = "Etat civil: " + std::string(getEtatCivil());
+            displayText(window, displayName, font);
         }
 
         int attack(Personnage p){ return p.getVie() - map_armes[getArme()].points; }
@@ -230,18 +258,27 @@ class Monstre : public Personnage{
             return p.getVie() - (force * map_armes[getArme()].points);
         }
 
-        void getMonstre(){
-            cout << endl;
-            cout << "ID/Num: " << getNum() << endl;
-            cout << "Nom: " << getNom() << endl;
-            cout << "Age: " << getAge() << endl;
-            cout << "Vie: " << getVie() << endl;
-            cout << "Conte: " << getConte() << endl;
-            cout << "Arme: " << getArme() << endl;
-            cout << "Type: " << getType() << endl;
-            cout << "Couleur: " << getCouleur() << endl;
-            cout << "Force: " << getForce() << endl;
-            cout << "Gentil: " << getGentil() << endl;
+        void getMonstre(sf::RenderWindow& window, sf::Font& font){
+            std::string displayName = "Num: " + std::to_string(getNum()); 
+            displayText(window, displayName, font); 
+            displayName = "Nom: " + std::string(getNom());
+            displayText(window, displayName, font);
+            displayName = "Age: " + std::to_string(getAge());
+            displayText(window, displayName, font);
+            displayName = "Vie: " + std::to_string(getVie());
+            displayText(window, displayName, font); 
+            displayName = "Conte: " + std::string(getConte());
+            displayText(window, displayName, font); 
+            displayName = "Arme: " + std::to_string(getArme());
+            displayText(window, displayName, font);
+            displayName = "Type: " + std::string(getType());
+            displayText(window, displayName, font);
+            displayName = "Couleur: " + std::string(getCouleur());
+            displayText(window, displayName, font);
+            displayName = "Force: " + std::to_string(getForce());
+            displayText(window, displayName, font);
+            displayName = "Gentil: " + std::to_string(getGentil());
+            displayText(window, displayName, font);
         }
 
         // void appartient(Personnage p){}
@@ -312,7 +349,7 @@ class Sort{
     private:        
         int num;
         char nom[MAX_INPUT];
-        int coutMana;
+        int mana;
         bool estDisponible;
         int degat;
         char element[MAX_INPUT];
@@ -329,7 +366,7 @@ class Sort{
         // Getters
         int getNum(){return num;}
         char* getNom(){return nom;}
-        int getCoutMana(){return coutMana;}
+        int getCoutMana(){return mana;}
         bool getEstDisponible(){return estDisponible;}
         int getDegat(){return degat;}
         char* getElement(){return element;}
@@ -343,7 +380,7 @@ class Sort{
         // Setters
         void setNum(int n){num = n;}
         void setNom(const char n[MAX_INPUT]){strcpy(nom, n);}
-        void setCoutMana(int cm){coutMana = cm;}
+        void setCoutMana(int cm){mana = cm;}
         void setEstDisponible(bool ed){estDisponible = ed;}
         void setDegat(int d){degat = d;}
         void setElement(const char e[MAX_INPUT]){strcpy(element, e);}
@@ -355,25 +392,34 @@ class Sort{
         void setType(int t){type = t;}
         void setDescription(const char d[MAX_TEXT]){strcpy(description, d);}
         // Methods
-        void getSort(){
-            cout << endl;
-            cout << "ID: " << getNum() << endl;
-            cout << "Nom: " << getNom() << endl;
-            cout << "Description: " << getDescription() << endl;
-            cout << "Cout en mana: " << getCoutMana() << endl;
+        void getSort(sf::RenderWindow& window, sf::Font& font){
+            std::string displayName = "Num: " + std::to_string(getNum()) ;
+            displayText(window, displayName, font);
+            displayName = "Nom: " + std::string(getNom());
+            displayText(window, displayName, font);
+            displayName = "Description: " + std::string(getDescription());
+            displayText(window, displayName, font);
+            displayName = "Cout en mana: " + std::to_string(getCoutMana());
+            displayText(window, displayName, font);
             if(type == OFFENSIF){
-                cout << "Degats: " << getDegat() << endl; 
+                displayName = "Degats: " + std::to_string(getDegat());
+                displayText(window, displayName, font);
             }
             if(type == BUFF){
-                cout << "Buff def: " << getBuffDef() << endl;
-                cout << "Buff atk: " << getBuffAtk() << endl;
+                displayName = "Buff def: " + std::to_string(getBuffDef());
+                displayText(window, displayName, font);
+                displayName = "Buff atk: " + std::to_string(getBuffAtk());
+                displayText(window, displayName, font); 
             }
             if(type == DEBUFF){
-                cout << "Debuff def: " << getDebuffDef() << endl;
-                cout << "Debuff atk: " << getDebuffAtk() << endl;
+                displayName = "Debuff def: " + std::to_string(getDebuffDef());
+                displayText(window, displayName, font);
+                displayName = "Debuff atk: " + std::to_string(getDebuffAtk());
+                displayText(window, displayName, font);
             }
             if(type == SOIN){
-                cout << "Soin: " << getSoin() << endl << endl;
+                displayName = "Soin: " + std::to_string(getSoin());
+                displayText(window, displayName, font); 
             } 
         }
 };

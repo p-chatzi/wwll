@@ -1,0 +1,11 @@
+"filename", "language", "Makefile", "Markdown", "C++", "comment", "blank", "total"
+"/home/peter/Documents/isen/Algo/wwll/Makefile", "Makefile", 8, 0, 0, 0, 3, 11
+"/home/peter/Documents/isen/Algo/wwll/README.md", "Markdown", 0, 4, 0, 0, 4, 8
+"/home/peter/Documents/isen/Algo/wwll/src/controlleur.cpp", "C++", 0, 0, 442, 25, 40, 507
+"/home/peter/Documents/isen/Algo/wwll/src/controlleur.h", "C++", 0, 0, 22, 2, 5, 29
+"/home/peter/Documents/isen/Algo/wwll/src/main.cpp", "C++", 0, 0, 18, 3, 5, 26
+"/home/peter/Documents/isen/Algo/wwll/src/modele.cpp", "C++", 0, 0, 73, 0, 6, 79
+"/home/peter/Documents/isen/Algo/wwll/src/modele.h", "C++", 0, 0, 307, 36, 38, 381
+"/home/peter/Documents/isen/Algo/wwll/src/vue.cpp", "C++", 0, 0, 329, 29, 43, 401
+"/home/peter/Documents/isen/Algo/wwll/src/vue.h", "C++", 0, 0, 28, 5, 8, 41
+"Total", "-", 8, 4, 1219, 100, 152, 1483

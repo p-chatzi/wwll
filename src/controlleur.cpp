@@ -1,23 +1,21 @@
 #include <iostream>
 #include <unistd.h>
+#include <SFML/Graphics.hpp>
 
-#include "controlleur.h"
-#include "modele.h"
 #include "vue.h"
+#include "modele.h"
 
 using namespace std;
 
-// testing branch change
-
 // Fonctions privees
-Princeroi selectionPrinceroi(){
+Princeroi selectionPrinceroi(sf::RenderWindow& window, sf::Font& font){
     while(1){
-    int selectionId = choixPrinceroi();
-    cout << selectionId << endl;
-    Princeroi princeroi(selectionId);
-    princeroi.getPrinceroi();
-    if(estChoixConfirmer())
-        return princeroi;
+        int selectionId = choixPrinceroi(window, font);
+        displayText(window, std::to_string(selectionId), font);
+        Princeroi princeroi(selectionId);
+        princeroi.getPrinceroi(window, font);
+        if(estChoixConfirmer(window, font))
+            return princeroi;
     }
 }
 
@@ -57,19 +55,26 @@ void evolutionChampignouf(Princeroi& p){
     p.setNom("Super champignouf");
 }
 
-void evolve(Princeroi& p, int wait){
+void evolve(sf::RenderWindow& window, sf::Font& font, Princeroi& p, int wait){
     if(p.getLevel() % 5 == 0){
-        cout << endl << p.getNom() << " que se passe t-il?..." << endl;
+        std::string displayName = std::string(p.getNom()) + " que se passe t-il?...";
+        displayText(window, displayName, font);
         usleep(wait);
-        cout << p.getNom() << " se tranforme..." << endl;
+
+        displayName = std::string(p.getNom()) + " se transforme...";
+        displayText(window, displayName, font);
         usleep(wait);
-        cout << p.getNom() << " evolue en: ";
+        
+        displayName = std::string(p.getNom()) + "evolue en: ";
+        displayText(window, displayName, font);
         evolutionChampignouf(p);
-        cout << p.getNom() << "!" << endl << endl;
+        
+        displayName = std::string(p.getNom()) + "!";
+        displayText(window, displayName, font);
     }
 }
 
-void levelUp(Princeroi& p, int gainXp, int wait){
+void levelUp(sf::RenderWindow& window, sf::Font& font, Princeroi& p, int gainXp, int wait){
     if((p.getXp() / 100) > p.getLevel()){
         // Up max vie et mana et regen
         p.setLevel(p.getLevel() + 1);
@@ -77,10 +82,10 @@ void levelUp(Princeroi& p, int gainXp, int wait){
         p.setMaxMana(p.getMaxMana() + 5);
         p.setVie(p.getMaxVie());
         p.setMana(p.getMaxMana()); 
-        cout << endl << "Level up - Vous passez Lvl." << p.getLevel() << endl;
-        currentHp(p);
-        currentMana(p);
-        evolve(p, wait);
+        displayText(window, "Level up - Vous passez Lvl." + std::to_string(p.getLevel()), font);
+        currentHp(window, font, p);
+        currentMana(window, font, p);
+        evolve(window, font, p, wait);
     }
 }
 
@@ -89,42 +94,42 @@ void appliqueSort(Sort& sort, Personnage& lanceur, Personnage& cible){
         cible.setVie(cible.getVie() - sort.getDegat());
     }
     if(sort.getType() == DEBUFF){
-        cout << "WIP" << endl;
+        std::cerr << "WIP" << endl;
     }
     if(sort.getType() == BUFF){
-        cout << "WIP" << endl;
+        std::cerr << "WIP" << endl;
     }
     if(sort.getType() == SOIN)
         cible.setVie(cible.getVie() + sort.getSoin());
 }
 
-bool lancerSort(Princeroi& p, Monstre& m){
+bool lancerSort(sf::RenderWindow& window, sf::Font& font, Princeroi& p, Monstre& m){
     while (1) {
         // Selection d'un sort
-        int choix = choixSort(p);
+        int choix = choixSort(window, font, p);
         if(choix >= 0 && choix < NB_SORTS){
             // On affiche les details de ce sort
             Sort sort(choix);
-            sort.getSort();
-            if(estChoixConfirmer() && p.getMana() >= sort.getCoutMana()){
+            sort.getSort(window, font);
+            if(estChoixConfirmer(window, font) && p.getMana() >= sort.getCoutMana()){
                 // On applique si la selection est confirmer
                 p.setMana(p.getMana() - sort.getCoutMana());
                 if(sort.getType() == OFFENSIF || sort.getType() == DEBUFF){
                     appliqueSort(sort, p, m);
-                    showSort(sort, p, m);
+                    showSort(window, font, sort, p, m);
                 }
                 else{
                     appliqueSort(sort, p, p);
-                    showSort(sort, p, p);
+                    showSort(window, font, sort, p, p);
                 }
                 return true;
             }
             else if(p.getMana() < sort.getCoutMana()){
-                cout << "Mana insufisant" << endl;
+                displayText(window, "Mana insufisant", font);
                 continue;
             }
             // On revient a la liste des sorts si on change davis
-            else if(!estChoixConfirmer()){
+            else if(!estChoixConfirmer(window, font)){
                 continue;
             }
         }
@@ -132,49 +137,49 @@ bool lancerSort(Princeroi& p, Monstre& m){
             return false;
         }
         else{
-            cout << "Choix invalide" << endl;
+            displayText(window, "Choix invalide", font);
             continue;
         }
-        }
+    }
 }
 
-bool isFightWon(Princeroi& p, Monstre m, int wait){
+bool isFightWon(sf::RenderWindow& window, sf::Font& font, Princeroi& p, Monstre m, int wait){
     while(p.getVie() > 0 && m.getVie() > 0){
-        currentHp(p);
-        currentMana(p);
-        currentHp(m);
-        currentMana(m);
-        int choix = fightChoice(); 
+        currentHp(window, font, p);
+        currentMana(window, font, p);
+        currentHp(window, font, m);
+        currentMana(window, font, m);
+        int choix = fightChoice(window, font); 
         switch(choix){ // Tour du hero
             case ATTACK:
                 m.setVie(p.attack(m));
-                showAttack(p, m, wait);
+                showAttack(window, font, p, m, wait);
                 break;
             case SORT:
-                if(lancerSort(p, m))  
+                if(lancerSort(window, font, p, m))  
                     break;
                 else
                     continue;
             default:
-                cout << "Choix invalide, reesayer" << endl;
+                displayText(window, "Choix invalide, reesayer", font);
                 break;
         }
 
         if(m.getVie() > 0){ /// Le tour du monstre
             p.setVie(m.attack(p));
-            showAttack(m, p, wait);
+            showAttack(window, font, m, p, wait);
         }
         else{ // Le monstre est mort
-            int gainXp = p.getXp() + m.getMaxVie();
-            cout << m.getNom() << " est mort. Tu as gagne ";
-            cout << gainXp << "XP" << endl;
+            int xp = p.getXp() + m.getMaxVie();
+            gainXp(window, font, xp);
             usleep(wait);
-            p.setXp(gainXp);
-            levelUp(p, gainXp, wait);
+            p.setXp(xp);
+            levelUp(window, font, p, xp, wait);
             return true;
         }
         if(p.getVie() <= 0){ // L'hero meurt
-            cout << p.getNom() << " est mort" << endl;
+            std::string displayName = std::string(p.getNom()) + " est mort";
+            displayText(window, displayName, font);            
             usleep(wait);
             return false;
         }
@@ -182,98 +187,37 @@ bool isFightWon(Princeroi& p, Monstre m, int wait){
     return false;
 }
 
-void debutAventure(int wait){
-    Princeroi hero = selectionPrinceroi();
-    cout << "Welcome, " << hero.getNom() << ", " << hero.getConte() << endl;
-    story1(wait);
-    story2(wait);
-    story3(wait);
-    waitForEnter();
+void debutAventure(sf::RenderWindow& window, sf::Font& font, int wait){
+    Princeroi hero = selectionPrinceroi(window, font);
+    std::string displayName = "Welcome, " + std::string(hero.getNom()) + ", " + std::string(hero.getConte());
+    displayText(window, displayName, font);
+    story1(window, wait);
+    story2(window, wait);
+    story3(window, wait);
+    waitForEnter(window, font);
 
     // Fight vs Warior
     Monstre warior;
     initWarior(warior);
-    cout << "Un Warior sauvage apparait et vous lache une caisse!" << endl;
-    usleep(wait);
-    cout << "Mecreant, vous ne pouvez point laisser cela passer" << endl;
-    usleep(wait);
-    cout << "[insert epic battle music]" << endl << endl;
-    waitForEnter();
-    if(!isFightWon(hero, warior, wait))
-        return;
-    cout << "Bravo, allez voir Peach pour une belle recompense" << endl;
-    dots(wait);
-    cout << "Ah merde!" << endl << "Bon vas sauvez Bowser... euh peach" << endl;
-    usleep(wait);
-    waitForEnter();
-
-    // Fight vs Yipee
-    Monstre yipee;
-    initYipee(yipee);
-    cout << "Tu scrutine le buisson devant toi..." << endl;
-    usleep(wait);
-    cout << "Le buisson bouge, un goomba serait encore en vie?" << endl;
-    usleep(wait);
-    cout << "SAUTE DESSUS!" << endl << "[insert epic battle music]" << endl;
-    usleep(wait);
-    waitForEnter();
-    if(!isFightWon(hero, yipee, wait))
-        return;
-    cout << "SAUVAGE ! TU DOIS TOUT TUER SUR TON CHEMIN OU QUOI???" << endl;
-    usleep(wait);
-    cout << "Le pauvre yipee... nos seul ami... mort" << endl;
-    dots(wait);
-    cout << "DE TES MAINS, TES MAINS ENSENGLENTEES!" << endl;
-    usleep(wait);
-    cout << "Tu n'entendras plus de yipee, tu ne verras plus de yipee" << endl;
-    usleep(wait);
-    cout << "Continue donc ton pauvre chemin" << endl << endl;
-    usleep(wait);
-    waitForEnter();
-
-    // Post story for testing
-    cout << endl << "Vous avez fini le mode histoire" << endl;
-    cout << "Vous allez taper des warior en boucle pour l'xp" << endl;
-    Monstre w1, w2, w3, w4;
-    initWarior(w1);
-    initWarior(w2);
-    initWarior(w3);
-    initWarior(w4);
-    usleep(wait);
-    cout << "[insert epic battle music]" << endl << endl;
-    waitForEnter();
-    if(!isFightWon(hero, w1, wait))
-        return;
-    usleep(wait);
-    cout << "[insert epic battle music]" << endl << endl;
-    waitForEnter();
-    if(!isFightWon(hero, w2, wait))
-        return;
-    usleep(wait);
-    cout << "[insert epic battle music]" << endl << endl;
-    waitForEnter();
-    if(!isFightWon(hero, w3, wait))
-        return;
-    usleep(wait);
-    cout << "[insert epic battle music]" << endl << endl;
-    waitForEnter();
-    if(!isFightWon(hero, w4, wait))
+    beforeWarior(window, font, wait);
+    waitForEnter(window, font);
+    if(!isFightWon(window, font, hero, warior, wait))
         return;
 }
 
-void settings(int* wait){
-    int choix = settingsMenu();
+void settings(sf::RenderWindow& window, sf::Font& font, int* wait){
+    int choix = settingsMenu(window, font);
     switch(choix){
         case V_TEXT:
-            *wait = changeTextSpeed();
+            *wait = changeTextSpeed(window, font);
             break;
         case VOL:
-            cout << "Pour plus tard" << endl;
+            displayText(window, "Pour plus tard", font);
             break;
         case EXIT_SETTINGS:
             return;
         default:
-            cout << "Entree invalide, reesayer" << endl;
+            displayText(window, "Entree invalide, reesayer", font);
             break;
     }
 }
@@ -282,34 +226,33 @@ void settings(int* wait){
 /*
     Affiche la liste des options
 */
-void menu(){
+void menu(sf::RenderWindow& window, sf::Font& font){
     while(1){
-        afficheMainMenu();
-        int choix, wait;
-        cin >> choix;
+        afficheMainMenu(window);
+        int choix = getUserInput(window); 
+        cout << "choix = "<< choix << endl;
+        int wait = 2000;
         switch (choix)
         {
         case START:
-            system("clear");
-            debutAventure(wait);
+            debutAventure(window, font, wait);
             break;
 
         case LOAD:
-            system("clear");
-            cout << "WIP" << endl;
+            displayText(window, "WIP", font);
             break;
 
         case SETTINGS:
             system("clear");
-            settings(&wait);
+            settings(window, font, &wait);
             break;
 
         case QUIT:
-            cout << "A bientot" << endl;
+            displayText(window, "A bientot!", font);
             exit(0);
 
         default:
-            cout << "Choix invalide, ressayer" << endl;
+            displayText(window, "Choix invalide, reesayer", font);
             break;
         }
     }
@@ -318,12 +261,11 @@ void menu(){
 /*
     Change l'arme du personnage choisi
 */
-void changementArme(arme_s& a, Personnage& p){
-    listeArmes();
-    cout << "Votre choix: " << endl;
-    int choix;
-    cin >> choix;
-    p.changeArme(a, p, choix);
+void changementArme(sf::RenderWindow& window, sf::Font& font, arme_s& a, Personnage& p){
+    listeArmes(window, font);
+    displayText(window, "Votre choix: ", font);
+    int choix = getUserInput(window);
+    p.changeArme(a, p, choix, window, font);
 }
 
 // Initiations des Personnages
@@ -548,4 +490,5 @@ void initBaumeAppaisant(Sort& bp){
     bp.setEstDisponible(true);
     bp.setType(SOIN);
     bp.setDescription("Medic, I need a medic!");
+    bp.setSoin(50);
 }

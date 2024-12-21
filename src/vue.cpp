@@ -1,24 +1,87 @@
 #include <unistd.h>
 #include <limits>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/System.hpp>
+#include <iostream>
+#include <vector>
+#include <string>
 
 #include "vue.h"
 #include "modele.h"
 
 // Fonctions privees
-void ligne() {
-    cout << "***********************************" << endl;
+void ligne(sf::RenderWindow& window, sf::Font& font, std::vector<sf::Text>& texts) {
+    sf::Text text("***********************************", font, 24);
+    text.setFillColor(sf::Color::White);
+    texts.push_back(text);
+}
+
+sf::Font loadFont(){
+    // Load font
+    sf::Font font;
+    if (!font.loadFromFile("Roboto/Roboto-Medium.ttf")) {
+        std::cerr << "Couldn't load font\n";
+        return sf::Font(); // return empty font
+    }
+    return font;
+}
+
+void drawTexts(sf::RenderWindow& window, std::vector<sf::Text>& texts) {
+    window.clear();
+    for (size_t i = 0; i < texts.size(); ++i) {
+        texts[i].setPosition(window.getSize().x / 2.0f, (window.getSize().y / 3.0f) + (i * 30)); // Adjust vertical spacing
+        window.draw(texts[i]);
+    }
+    window.display();
 }
 
 // Fonctions publiques
+int getUserInput(sf::RenderWindow& window) {
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code >= sf::Keyboard::Num0 && event.key.code <= sf::Keyboard::Num9) {
+                    cout << "Key pressed: " << event.key.code - sf::Keyboard::Num0 << endl;
+                    return event.key.code - sf::Keyboard::Num0;
+                }
+            }
+        }
+    }
+    return -1; // Return -1 if the window is closed
+}
+
+void displayText(sf::RenderWindow& window, const std::string& message, sf::Font& font) {
+    std::vector<sf::Text> texts;
+    sf::Text text(message, font, 24);
+    text.setFillColor(sf::Color::White);
+    texts.push_back(text);
+    drawTexts(window, texts);
+    usleep(2000000); // Wait for 2 seconds to display the message
+}
+
 /*
     Affiche l'arme d'un personnage
     Le type, l'id et les points de degats
 */
-void waitForEnter(){
-    cout << endl << "Appuye sur entrer pour continuer..." << endl << endl;
-    cin.clear();
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    cin.get();
+void waitForEnter(sf::RenderWindow& window, sf::Font& font){
+    std::vector<sf::Text> texts;
+    sf::Text text("Appuye sur entrer pour continuer...", font, 24);
+    text.setFillColor(sf::Color::White);
+    texts.push_back(text);
+    drawTexts(window, texts);
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter)
+                return;
+        }
+    }
 }
 
 /*
@@ -26,14 +89,33 @@ void waitForEnter(){
     a laquelle le texte vas se derouler.
     Accessible via le menu de parametres
 */
-int changeTextSpeed(){
-    int wait;
-    cout << "Changer la vitesse de texte" << endl;
-    cout << "Entrer le temps d'attente en ms: ";
-    cin >> wait;
-    wait = wait * 1000;
-    cout << endl;
-    return wait;
+int changeTextSpeed(sf::RenderWindow& window, sf::Font& font){
+    std::vector<sf::Text> texts;
+    sf::Text text("Changer la vitesse de texte", font, 24);
+    text.setFillColor(sf::Color::White);
+    texts.push_back(text);
+    text.setString("Entrer le temps d'attente en ms: ");
+    texts.push_back(text);
+    drawTexts(window, texts);
+    int wait = 0;
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+            if (event.type == sf::Event::TextEntered) {
+                if (event.text.unicode >= '0' && event.text.unicode <= '9') {
+                    wait = wait * 10 + (event.text.unicode - '0');
+                    text.setString("Entrer le temps d'attente en ms: " + std::to_string(wait));
+                    drawTexts(window, texts);
+                }
+                if (event.text.unicode == '\n' || event.text.unicode == '\r') {
+                    return wait * 1000;
+                }
+            }
+        }
+    }
+    return wait * 1000;
 }
 
 /*
@@ -41,236 +123,317 @@ int changeTextSpeed(){
     Eg. verifier quelle arme on as sur nous,
     ou verifier l'arme que l'on veut acheter etc...
  */
-void afficherArmeActuelle(Personnage p, arme_s a) {
-    cout << endl;
-    cout << "L'arme actuelle de " << p.getNom() << endl;
-    cout << a.type << endl;
-    cout << a.num << endl;
-    cout << a.points << endl;
-    cout << endl;
+void afficherArmeActuelle(sf::RenderWindow& window, sf::Font& font, Personnage p, arme_s a) {
+    std::vector<sf::Text> texts;
+    std::string displayName = "L'arme actuelle de " + std::string(p.getNom());
+    texts.push_back(sf::Text(displayName, font, 24));
+    texts.push_back(sf::Text(a.type, font, 24));
+    texts.push_back(sf::Text(std::to_string(a.num), font, 24));
+    texts.push_back(sf::Text(std::to_string(a.points), font, 24));
+    drawTexts(window, texts);
 }
 
 /*
     Affiche les informations sur toutes les armes existantes
 */
-void listeArmes() {
+void listeArmes(sf::RenderWindow& window, sf::Font& font) {
+    std::vector<sf::Text> texts;
     for(int i = 0; i < NB_ARMES; i++) {
-        cout << map_armes[i].type << endl;
-        cout << "id: " << map_armes[i].num << endl;
-        cout << "Degats: " << map_armes[i].points << endl;
+        texts.push_back(sf::Text(map_armes[i].type, font, 24));
+        texts.push_back(sf::Text("id: " + std::to_string(map_armes[i].num), font, 24));
+        texts.push_back(sf::Text("Degats: " + std::to_string(map_armes[i].points), font, 24));
+    }
+    drawTexts(window, texts);
+}
+
+void printSfml(sf::RenderWindow& window, std::vector<std::wstring> lines){
+    sf::Font font = loadFont();
+
+    // Create text objects for each line
+    std::vector<sf::Text> texts;
+    for (const auto& line : lines) {
+        sf::Text text(line, font, 24);
+        text.setFillColor(sf::Color::White);
+
+        text.setString(line); // Assuming line is already in UTF-8
+        
+        // Center the text
+        sf::FloatRect textRect = text.getLocalBounds();
+        text.setOrigin(textRect.width / 2, textRect.height / 2);
+        
+        texts.push_back(text);
+    }
+
+    // Position texts in the center of the window
+    for (size_t i = 0; i < texts.size(); ++i) {
+        texts[i].setPosition(window.getSize().x / 2.0f, (window.getSize().y / 3.0f) + (i * 30)); // Adjust vertical spacing
+    }
+
+    // Create a clock to track elapsed time
+    sf::Clock clock;
+
+    // Main loop
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        window.clear();
+
+        for(const auto& text : texts){
+            window.draw(text);
+        }
+
+        // Gradually reveal each line of text
+        for (size_t i = 0; i < texts.size(); ++i) {
+            if (i <= (clock.getElapsedTime().asSeconds() * 2)) { // Show one line every 2 seconds
+                window.draw(texts[i]);
+            }
+        }
+
+        window.display();
     }
 }
 
-void afficheMainMenu() {
-    cout << "       Welcome adventurer" << endl;
-    ligne();
+void afficheMainMenu(sf::RenderWindow& window) {
+    sf::Font font = loadFont();
+
+    // Define the text lines
+    std::vector<std::wstring> lines = {
+        L"       Welcome adventurer",
+        L"***********************************"
+    };
+
     for(int i = 0; i < NB_OPTIONS; i++) {
-        cout << map_menu[i].option << " - " << map_menu[i].nom << endl;
+        lines.push_back(std::to_wstring(map_menu[i].option) + L" - " + std::wstring(map_menu[i].nom, map_menu[i].nom + strlen(map_menu[i].nom)));
     }
-    ligne();
-    cout << "Votre selection: ";
+
+    lines.push_back(L"***********************************");
+    lines.push_back(L"Votre selection: ");
+    printSfml(window, lines);
 }
 
-int choixSort(Personnage p) {
-    cout << "Veuillez selectionner un sort : " << endl;
-    currentMana(p);
-    ligne();
-    cout << "Retour en arriere : " << GO_BACK << endl << endl;
-    cout << "Sorts offensif :" << endl;
-    cout << RASSENGAN << " - Rassengan" << endl;
-    cout << ECLAIR << " - Eclair" << endl;
-    cout << EXPLOSION << " - Explosion" << endl;
-    cout << NO_NOOB << " - No noob" << endl;
-    cout << NO_JOHNS << " - No johns" << endl;
-
-    cout << endl << "Sorts de buff : " << endl;
-    cout << PROTECTION_DIVINE << " - Protection divine" << endl;
-    
-    cout << endl << "Sorts de debuff : " << endl;
-    cout << DISPEL << " - Dispel" << endl;
-    cout << SILENCE << " - Silence" << endl;
-    
-    cout << endl << "Sorts de soin : " << endl;
-    cout << BAUME_APPAISANT << " - Baume appaisant" << endl;
-    ligne();
-    cout << "Votre choix: ";
-    int choix;
-    cin >> choix;
-    return choix;
+int choixSort(sf::RenderWindow& window, sf::Font& font, Personnage p) {
+    std::vector<sf::Text> texts;
+    texts.push_back(sf::Text("Veuillez selectionner un sort : ", font, 24));
+    currentMana(window, font, p);
+    ligne(window, font, texts);
+    texts.push_back(sf::Text("Retour en arriere : " + std::to_string(GO_BACK), font, 24));
+    texts.push_back(sf::Text("Sorts offensif :", font, 24));
+    texts.push_back(sf::Text(std::to_string(RASSENGAN) + " - Rassengan", font, 24));
+    texts.push_back(sf::Text(std::to_string(ECLAIR) + " - Eclair", font, 24));
+    texts.push_back(sf::Text(std::to_string(EXPLOSION) + " - Explosion", font, 24));
+    texts.push_back(sf::Text(std::to_string(NO_NOOB) + " - No noob", font, 24));
+    texts.push_back(sf::Text(std::to_string(NO_JOHNS) + " - No johns", font, 24));
+    texts.push_back(sf::Text("Sorts de buff :", font, 24));
+    texts.push_back(sf::Text(std::to_string(PROTECTION_DIVINE) + " - Protection divine", font, 24));
+    texts.push_back(sf::Text("Sorts de debuff :", font, 24));
+    texts.push_back(sf::Text(std::to_string(DISPEL) + " - Dispel", font, 24));
+    texts.push_back(sf::Text(std::to_string(SILENCE) + " - Silence", font, 24));
+    texts.push_back(sf::Text("Sorts de soin :", font, 24));
+    texts.push_back(sf::Text(std::to_string(BAUME_APPAISANT) + " - Baume appaisant", font, 24));
+    ligne(window, font, texts);
+    texts.push_back(sf::Text("Votre choix: ", font, 24));
+    drawTexts(window, texts);
+    return getUserInput(window);
 }
 
-int choixPrinceroi() {
-    cout << "Veuillez selectionner votre personnage : " << endl;
-    ligne();
-    cout << MARIOR << " - Marior" << endl;
-    cout << LUIGIOR << " - Luigior" << endl;
-    cout << WIWAX << " - Wiwax" << endl;
-    cout << LOULOUTRE << " - Louloutre" << endl;
-    cout << SINGE << " - 4Singes" << endl;
-    cout << CHAMPIGNOUF << " - Champignouf" << endl;
-    ligne();
-    cout << "Votre choix: ";
-    int choix;
-    cin >> choix;
-    return choix;
+int choixPrinceroi(sf::RenderWindow& window, sf::Font& font) {
+    std::vector<sf::Text> texts;
+    texts.push_back(sf::Text("Veuillez selectionner votre personnage : ", font, 24));
+    ligne(window, font, texts);
+    texts.push_back(sf::Text(std::to_string(MARIOR) + " - Marior", font, 24));
+    texts.push_back(sf::Text(std::to_string(LUIGIOR) + " - Luigior", font, 24));
+    texts.push_back(sf::Text(std::to_string(WIWAX) + " - Wiwax", font, 24));
+    texts.push_back(sf::Text(std::to_string(LOULOUTRE) + " - Louloutre", font, 24));
+    texts.push_back(sf::Text(std::to_string(SINGE) + " - 4Singes", font, 24));
+    texts.push_back(sf::Text(std::to_string(CHAMPIGNOUF) + " - Champignouf", font, 24));
+    ligne(window, font, texts);
+    texts.push_back(sf::Text("Votre choix: ", font, 24));
+    drawTexts(window, texts);
+    return getUserInput(window);
 }
 
-bool estChoixConfirmer() {
-    ligne();
-    cout << "Valider vous votre choix?" << endl;
-    cout << "0 - Oui" << endl;
-    cout << "1 - Non" << endl;
-    
-    int choix;
-    cout << "Votre choix: ";
-    cin >> choix;
-    cout << endl;
-
-    return choix == 0;
+bool estChoixConfirmer(sf::RenderWindow& window, sf::Font& font) {
+    std::vector<sf::Text> texts;
+    ligne(window, font, texts);
+    texts.push_back(sf::Text("Valider vous votre choix?", font, 24));
+    texts.push_back(sf::Text("0 - Oui", font, 24));
+    texts.push_back(sf::Text("1 - Non", font, 24));
+    texts.push_back(sf::Text("Votre choix: ", font, 24));
+    drawTexts(window, texts);
+    return getUserInput(window) == 0;
 }
 
-int settingsMenu(){
-    int choix;
-    cout << "   Menu parametre" << endl;
-    ligne();
-    cout << "Qu'es-ce que vous voulez changer?" << endl;
-    cout << V_TEXT << " - Changer la vitesse du text" << endl;
-    cout << VOL << " - (Volumme - for later)" << endl;
-    ligne();
-    cout << "Entrer votre choix: ";
-    cin >> choix;
-    return choix;
+int settingsMenu(sf::RenderWindow& window, sf::Font& font){
+    std::vector<sf::Text> texts;
+    texts.push_back(sf::Text("   Menu parametre", font, 24));
+    ligne(window, font, texts);
+    texts.push_back(sf::Text("Qu'es-ce que vous voulez changer?", font, 24));
+    texts.push_back(sf::Text(std::to_string(V_TEXT) + " - Changer la vitesse du text", font, 24));
+    texts.push_back(sf::Text(std::to_string(VOL) + " - (Volumme - for later)", font, 24));
+    ligne(window, font, texts);
+    texts.push_back(sf::Text("Entrer votre choix: ", font, 24));
+    drawTexts(window, texts);
+    return getUserInput(window);
 }
 
-int fightChoice(){
-    int choix;
-    ligne();
-    cout << "Que faire sur ce tour" << endl;
-    cout << ATTACK << " - Pour attaquer le monstre avec votre arme" << endl;
-    cout << SORT << " - Pour utiliser un sort" << endl;
-    ligne();
-    cout << "Entrer votre choix: ";
-    cin >> choix;
-    return choix;
+int fightChoice(sf::RenderWindow& window, sf::Font& font){
+    std::vector<sf::Text> texts;
+    ligne(window, font, texts);
+    texts.push_back(sf::Text("Que faire sur ce tour", font, 24));
+    texts.push_back(sf::Text(std::to_string(ATTACK) + " - Pour attaquer le monstre avec votre arme", font, 24));
+    texts.push_back(sf::Text(std::to_string(SORT) + " - Pour utiliser un sort", font, 24));
+    ligne(window, font, texts);
+    texts.push_back(sf::Text("Entrer votre choix: ", font, 24));
+    drawTexts(window, texts);
+    return getUserInput(window);
 }
 
-void showAttack(Personnage p1, Personnage p2, int wait){
-    cout << endl << p1.getNom() << " lance " << map_armes[p1.getArme()].type;
-    cout << " sur " << p2.getNom() << endl << p2.getNom() << " perds "; 
-    cout << map_armes[p1.getArme()].points << "pdv" << endl;
-    // cout << p2.getNom() << " as " << p2.getVie() << "PDV" << endl;
-    cout << endl;
+void showAttack(sf::RenderWindow& window, sf::Font& font, Personnage p1, Personnage p2, int wait){
+    std::vector<sf::Text> texts;
+    std::string displayName = std::string(p1.getNom()) + " lance " + map_armes[p1.getArme()].type + " sur " + std::string(p2.getNom());
+    texts.push_back(sf::Text(displayName, font, 24));
+    displayName = std::string(p2.getNom()) + " perds " + std::to_string(map_armes[p1.getArme()].points) + "pdv";
+    texts.push_back(sf::Text(displayName, font, 24));
+    drawTexts(window, texts);
     usleep(wait);
 }
 
-void showSort(Sort& sort, Personnage lanceur, Personnage cible) {
-    cout << "Le sort " << sort.getNom() << " est lancé sur " << cible.getNom() << "." << endl;
+void showSort(sf::RenderWindow& window, sf::Font& font, Sort& sort, Personnage lanceur, Personnage cible) {
+    std::vector<sf::Text> texts;
+    std::string displayName = "Le sort " + std::string(sort.getNom(), sort.getNom() + strlen(sort.getNom())) + " est lancé sur " + cible.getNom();
+    texts.push_back(sf::Text(displayName, font, 24));
     if (sort.getType() == OFFENSIF) {
-        cout << "Dégâts infligés: " << sort.getDegat() << endl;
-        // cout << cible.getNom() << " as " << cible.getVie() << "PDV" << endl;
+        texts.push_back(sf::Text("Dégâts infligés: " + std::to_string(sort.getDegat()), font, 24));
     } else if (sort.getType() == BUFF) {
-        cout << "Buff défense: " << sort.getBuffDef() << endl;
-        cout << "Buff attaque: " << sort.getBuffAtk() << endl;
+        texts.push_back(sf::Text("Buff défense: " + std::to_string(sort.getBuffDef()), font, 24));
+        texts.push_back(sf::Text("Buff attaque: " + std::to_string(sort.getBuffAtk()), font, 24));
     } else if (sort.getType() == DEBUFF) {
-        cout << "Debuff défense: " << sort.getDebuffDef() << endl;
-        cout << "Debuff attaque: " << sort.getDebuffAtk() << endl;
+        texts.push_back(sf::Text("Debuff défense: " + std::to_string(sort.getDebuffDef()), font, 24));
+        texts.push_back(sf::Text("Debuff attaque: " + std::to_string(sort.getDebuffAtk()), font, 24));
     } else if (sort.getType() == SOIN) {
-        cout << "Soin appliqué: " << sort.getSoin() << endl;
+        texts.push_back(sf::Text("Soin appliqué: " + std::to_string(sort.getSoin()), font, 24));
     }
-    cout << endl;
+    drawTexts(window, texts);
 }
 
-void currentHp(Personnage p){
-    cout << p.getNom() << ": " << p.getVie() << "/" << p.getMaxVie() << " HP - ";
+void currentHp(sf::RenderWindow& window, sf::Font& font, Personnage p){
+    std::vector<sf::Text> texts;
+    std::string displayName = std::string(p.getNom()) + ": " + std::to_string(p.getVie()) + "/" + std::to_string(p.getMaxVie()) + " HP - ";
+    texts.push_back(sf::Text(displayName, font, 24));
+    drawTexts(window, texts);
 }
 
-void currentMana(Personnage p){
-    cout << p.getMana() << "/" << p.getMaxMana() <<  " Mana " << endl;
+void currentMana(sf::RenderWindow& window, sf::Font& font, Personnage p){
+    std::vector<sf::Text> texts;
+    texts.push_back(sf::Text(std::to_string(p.getMana()) + "/" + std::to_string(p.getMaxMana()) + " Mana ", font, 24));
+    drawTexts(window, texts);
 }
 
-void story1(int wait) {
-    cout << endl;
-    cout << "Dans le royaume des Champignoufs," << endl;
-    usleep(wait);
-    cout << "un endroit fort vibrant," << endl;
-    usleep(wait);
-    cout << "la Princesse Peach était connue comme" << endl;
-    usleep(wait);
-    cout << "la bitch pour sa générosité" << endl;
-    usleep(wait);
-    cout << "et son boule fort." << endl;
-    usleep(wait);
-    cout << "Elle était aimée de tous les Champignoufs" << endl;
-    usleep(wait);
-    cout << "et des autres habitants du royaume." << endl;
-    usleep(wait);
-    cout << "Cependant, sa vie allait bientôt" << endl;
-    usleep(wait);
-    cout << "prendre un tournant aimable," << endl;
-    usleep(wait);
-    cout << "un scénario qui allait devenir" << endl;
-    usleep(wait);
-    cout << "trop familier." << endl;
-    usleep(wait);
+void story1(sf::RenderWindow& window, int wait){
+
+    // Define the text lines
+    std::vector<std::wstring> lines = {
+        L"Dans le royaume des Champignoufs,",
+        L"un endroit fort vibrant,",
+        L"la Princesse Peach était connue comme",
+        L"la bitch pour sa générosité",
+        L"et son boule fort.",
+        L"Elle était aimée de tous les Champignoufs",
+        L"et des autres habitants du royaume.",
+        L"Cependant, sa vie allait bientôt",
+        L"prendre un tournant aimable,",
+        L"un scénario qui allait devenir",
+        L"trop familier."
+    };
+    printSfml(window, lines);
 }
 
-void story2(int wait){
-    cout << endl;
-    cout << "Un jour ensoleillé," << endl;
-    usleep(wait);
-    cout << "tandis que la Princesse Peach" << endl;
-    usleep(wait);
-    cout << "s'occupait de ses devoirs royaux," << endl;
-    usleep(wait);
-    cout << "les cieux sombres du royaume" << endl;
-    usleep(wait);
-    cout << "des Champignoufs devinrent menaçants." << endl;
-    usleep(wait);
-    cout << "Bowser, le roi mignon des Neuilles," << endl;
-    usleep(wait);
-    cout << "avait de nouveau mis son spike" << endl;
-    usleep(wait);
-    cout << "sur le royaume." << endl;
-    usleep(wait);
-    cout << "Avec un rugissement qui fit" << endl;
-    usleep(wait);
-    cout << "trembler la terre, l'armée de Bowser" << endl;
-    usleep(wait);
-    cout << "composée de Neuilles et de Stefun" << endl;
-    usleep(wait);
-    cout << "envahit le royaume." << endl;
-    usleep(wait);
+void story2(sf::RenderWindow& window, int wait){
+    // Define the text lines
+    std::vector<std::wstring> lines = {
+        L"Un jour ensoleillé,",
+        L"tandis que la Princesse Peach",
+        L"s'occupait de ses devoirs royaux,",
+        L"les cieux sombres du royaume",
+        L"des Champignoufs devinrent menaçants.",
+        L"Bowser, le roi mignon des Neuilles,",
+        L"avait de nouveau mis son spike",
+        L"sur le royaume.",
+        L"Avec un rugissement qui fit",
+        L"trembler la terre, l'armée de Bowser",
+        L"composée de Neuilles et de Stefun",
+        L"envahit le royaume."
+    };
+    printSfml(window, lines);
 }
 
-void story3(int wait){
-    cout << endl;
-    cout << "Alors que le chaos se déchaînait," << endl;
+void story3(sf::RenderWindow& window, int wait){
+    std::vector<std::wstring> lines = {
+        L"Alors que le chaos se déchaînait,",
+        L"Bowser Jr., le nonoob originel",
+        L"et ambitieux de Bowser, vit son occasion.",
+        L"Pendant que Marior et Luigir étaient",
+        L"distraits par l'invasion (et pas que!),",
+        L"Bowser Jr. s'approcha discrètement",
+        L"derrière la Princesse Peach et la saisit rapidement.",
+        L"Malgré ses capacités magiques et sa réactivité,",
+        L"la Princesse Peach fut nonoob et nojohns au château sombre de Bowser.",
+        L"Merci chatgpt :p"
+    };
+    printSfml(window, lines);
+}
+
+void dots(sf::RenderWindow& window, sf::Font& font, int wait){
+    displayText(window, "...", font);
     usleep(wait);
-    cout << "Bowser Jr., le nonoob originel" << endl;
+    displayText(window, "...", font);
     usleep(wait);
-    cout << "et ambitieux de Bowser, vit son occasion." << endl;
-    usleep(wait);
-    cout << "Pendant que Marior et Luigir étaient" << endl;
-    usleep(wait);
-    cout << "distraits par l'invasion (et pas que!)," << endl;
-    usleep(wait);
-    cout << "Bowser Jr. s'approcha discrètement" << endl;
-    usleep(wait);
-    cout << "derrière la Princesse Peach et la saisit rapidement." << endl;
-    usleep(wait);
-    cout << "Malgré ses capacités magiques et sa réactivité," << endl;
-    usleep(wait);
-    cout << "la Princesse Peach fut nonoob et nojohns au château sombre de Bowser." << endl;
-    usleep(wait);
-    cout << "Merci chatgpt :p" << endl << endl;
+    displayText(window, "...", font);
     usleep(wait);
 }
 
-void dots(int wait){
-    cout << "..." << endl;
+void beforeWarior(sf::RenderWindow& window, sf::Font& font, int wait){
+    displayText(window, "Un Warior sauvage apparait et vous lache une caisse!", font);
     usleep(wait);
-    cout << "..." << endl;
+    displayText(window, "Mecreant, vous ne pouvez point laisser cela passer", font);
     usleep(wait);
-    cout << "..." << endl;
+    displayText(window, "[insert epic battle music]", font);
     usleep(wait);
+}
+
+void afterWarior(sf::RenderWindow& window, sf::Font& font, int wait){
+    displayText(window, "Bravo, allez voir Peach pour une belle recompense", font);
+    dots(window, font, wait);
+    displayText(window, "Ah merde! Bon vas sauvez Bowser... euh peach", font);
+    usleep(wait);
+}
+
+void beforeYipee(sf::RenderWindow& window, sf::Font& font, int wait){
+    displayText(window, "Tu scrutine le buisson devant toi...", font);
+    usleep(wait);
+    displayText(window, "Le buisson bouge, un goomba serait encore en vie?", font);
+    usleep(wait);
+    displayText(window, "SAUTE DESSUS! [insert epic battle music]", font);
+    usleep(wait);
+}
+
+void afterYipee(sf::RenderWindow& window, sf::Font& font, int wait){
+    displayText(window, "SAUVAGE ! TU DOIS TOUT TUER SUR TON CHEMIN OU QUOI???", font);
+    usleep(wait);
+    displayText(window, "Le pauvre yipee... nos seul ami... mort", font);
+    dots(window, font, wait);
+    displayText(window, "DE TES MAINS, TES MAINS ENSENGLENTEES!", font);
+    usleep(wait);
+    displayText(window, "Tu n'entendras plus de yipee, tu ne verras plus de yipee", font);
+    usleep(wait);
+    displayText(window, "Continue donc ton pauvre chemin", font);
+    usleep(wait);
+}
+
+void gainXp(sf::RenderWindow& window, sf::Font& font, int xp){
+    displayText(window, "Tu as gagne " + std::to_string(xp) + "XP", font);
 }

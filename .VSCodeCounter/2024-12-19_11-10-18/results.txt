@@ -1,0 +1,37 @@
+Date : 2024-12-19 11:10:18
+Directory : /home/peter/Documents/isen/Algo/wwll
+Total : 9 files,  1231 codes, 100 comments, 152 blanks, all 1483 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C++      |          7 |      1,219 |        100 |        145 |      1,464 |
+| Makefile |          1 |          8 |          0 |          3 |         11 |
+| Markdown |          1 |          4 |          0 |          4 |          8 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                     | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                        |          9 |      1,231 |        100 |        152 |      1,483 |
+| . (Files)                                                |          2 |         12 |          0 |          7 |         19 |
+| src                                                      |          7 |      1,219 |        100 |        145 |      1,464 |
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                 | language | code       | comment    | blank      | total      |
++----------------------------------------------------------+----------+------------+------------+------------+------------+
+| /home/peter/Documents/isen/Algo/wwll/Makefile            | Makefile |          8 |          0 |          3 |         11 |
+| /home/peter/Documents/isen/Algo/wwll/README.md           | Markdown |          4 |          0 |          4 |          8 |
+| /home/peter/Documents/isen/Algo/wwll/src/controlleur.cpp | C++      |        442 |         25 |         40 |        507 |
+| /home/peter/Documents/isen/Algo/wwll/src/controlleur.h   | C++      |         22 |          2 |          5 |         29 |
+| /home/peter/Documents/isen/Algo/wwll/src/main.cpp        | C++      |         18 |          3 |          5 |         26 |
+| /home/peter/Documents/isen/Algo/wwll/src/modele.cpp      | C++      |         73 |          0 |          6 |         79 |
+| /home/peter/Documents/isen/Algo/wwll/src/modele.h        | C++      |        307 |         36 |         38 |        381 |
+| /home/peter/Documents/isen/Algo/wwll/src/vue.cpp         | C++      |        329 |         29 |         43 |        401 |
+| /home/peter/Documents/isen/Algo/wwll/src/vue.h           | C++      |         28 |          5 |          8 |         41 |
+| Total                                                    |          |      1,231 |        100 |        152 |      1,483 |
++----------------------------------------------------------+----------+------------+------------+------------+------------+

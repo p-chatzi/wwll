@@ -1,10 +1,22 @@
 #ifndef CONTROLLEUR_H
 #define CONTROLLEUR_H
 
-#include "modele.h"
+#include <SFML/Graphics.hpp>
 
-void changementArme(arme_s& a, Personnage& p);
-void menu();
+// Forward declarations
+class Personnage;
+class Princeroi;
+class Princesse;
+class Monstre;
+class Sort;
+struct arme_s;
+
+#include "modele.h"
+#include "vue.h"
+
+void changementArme(sf::RenderWindow& window, sf::Font& font, arme_s& a, Personnage& p);
+void menu(sf::RenderWindow& window, sf::Font& font);
+
 
 // Initialisation des Personnages
 void initPeach(Princesse& peach);
