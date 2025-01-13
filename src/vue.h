@@ -9,6 +9,7 @@
 class Personnage;
 class arme_s;
 class Sort;
+class Princeroi;
 
 void waitForEnter(sf::RenderWindow& window, sf::Font& font);
 void afficherArmeActuelle(sf::RenderWindow& window, sf::Font& font, Personnage p, arme_s a);
@@ -17,6 +18,7 @@ void showSort(sf::RenderWindow& window, sf::Font& font, Sort& sort, Personnage l
 void currentHp(sf::RenderWindow& window, sf::Font& font, Personnage p);
 void currentMana(sf::RenderWindow& window, sf::Font& font, Personnage p);
 void gainXp(sf::RenderWindow& window, sf::Font& font, int xp);
+void printHero(sf::RenderWindow& window, sf::Font& font, Princeroi hero);
 
 // SFML
 void drawTexts(sf::RenderWindow& window, std::vector<sf::Text>& texts);
@@ -28,7 +30,7 @@ void listeArmes(sf::RenderWindow& window, sf::Font& font);
 
 // Menus
 int settingsMenu(sf::RenderWindow& window, sf::Font& font);
-void afficheMainMenu(sf::RenderWindow& window);
+void afficheMainMenu(sf::RenderWindow& window, sf::Font& font);
 
 // Choix
 int choixPrinceroi(sf::RenderWindow& window, sf::Font& font);
@@ -38,9 +40,9 @@ bool estChoixConfirmer(sf::RenderWindow& window, sf::Font& font);
 int changeTextSpeed(sf::RenderWindow& window, sf::Font& font);
 
 // Lore
-void story1(sf::RenderWindow& window, int wait);
-void story2(sf::RenderWindow& window, int wait);
-void story3(sf::RenderWindow& window, int wait);
+void story1(sf::RenderWindow& window, sf::Font& font, int wait);
+void story2(sf::RenderWindow& window, sf::Font& font, int wait);
+void story3(sf::RenderWindow& window, sf::Font& font, int wait);
 void dots(sf::RenderWindow& window, sf::Font& font, int wait);
 void beforeWarior(sf::RenderWindow& window, sf::Font& font, int wait);
 void afterWarior(sf::RenderWindow& window, sf::Font& font, int wait);

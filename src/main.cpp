@@ -13,7 +13,7 @@ using namespace std;
 // Doule init of font - how does that work ? Might cause bugs later
 
 int main() {
-    system("clear");
+    // system("clear");
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Centered Text Display");
     window.setFramerateLimit(60);
     sf::Font font;

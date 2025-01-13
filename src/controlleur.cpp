@@ -189,20 +189,26 @@ bool isFightWon(sf::RenderWindow& window, sf::Font& font, Princeroi& p, Monstre 
 
 void debutAventure(sf::RenderWindow& window, sf::Font& font, int wait){
     Princeroi hero = selectionPrinceroi(window, font);
-    std::string displayName = "Welcome, " + std::string(hero.getNom()) + ", " + std::string(hero.getConte());
-    displayText(window, displayName, font);
-    story1(window, wait);
-    story2(window, wait);
-    story3(window, wait);
+    printHero(window, font, hero);
+    story1(window, font, wait);
+    story2(window, font, wait);
+    story3(window, font, wait);
     waitForEnter(window, font);
 
     // Fight vs Warior
     Monstre warior;
     initWarior(warior);
     beforeWarior(window, font, wait);
-    waitForEnter(window, font);
     if(!isFightWon(window, font, hero, warior, wait))
         return;
+    afterWarior(window, font, wait);
+
+    Monstre yipee;
+    initYipee(yipee);
+    beforeYipee(window, font, wait);
+    if(!isFightWon(window, font, hero, yipee, wait))
+        return;
+    afterYipee(window, font, wait);
 }
 
 void settings(sf::RenderWindow& window, sf::Font& font, int* wait){
@@ -228,10 +234,9 @@ void settings(sf::RenderWindow& window, sf::Font& font, int* wait){
 */
 void menu(sf::RenderWindow& window, sf::Font& font){
     while(1){
-        afficheMainMenu(window);
+        afficheMainMenu(window, font);
         int choix = getUserInput(window); 
-        cout << "choix = "<< choix << endl;
-        int wait = 2000;
+        int wait = 1000 ;
         switch (choix)
         {
         case START:

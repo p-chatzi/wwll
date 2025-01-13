@@ -17,15 +17,15 @@ void ligne(sf::RenderWindow& window, sf::Font& font, std::vector<sf::Text>& text
     texts.push_back(text);
 }
 
-sf::Font loadFont(){
+// sf::Font loadFont(){
     // Load font
-    sf::Font font;
-    if (!font.loadFromFile("Roboto/Roboto-Medium.ttf")) {
-        std::cerr << "Couldn't load font\n";
-        return sf::Font(); // return empty font
-    }
-    return font;
-}
+    // sf::Font font;
+    // if (!font.loadFromFile("Roboto/Roboto-Medium.ttf")) {
+        // std::cerr << "Couldn't load font\n";
+        // return sf::Font(); // return empty font
+    // }
+    // return font;
+// }
 
 void drawTexts(sf::RenderWindow& window, std::vector<sf::Text>& texts) {
     window.clear();
@@ -38,19 +38,39 @@ void drawTexts(sf::RenderWindow& window, std::vector<sf::Text>& texts) {
 
 // Fonctions publiques
 int getUserInput(sf::RenderWindow& window) {
+    cout << "Entering getUserInput" << endl;
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            cout << "Event polled" << endl;
+            if (event.type == sf::Event::Closed) {
+                cout << "Window closed" << endl;
                 window.close();
+            }
             if (event.type == sf::Event::KeyPressed) {
+                cout << "Key pressed event detected" << endl;
                 if (event.key.code >= sf::Keyboard::Num0 && event.key.code <= sf::Keyboard::Num9) {
                     cout << "Key pressed: " << event.key.code - sf::Keyboard::Num0 << endl;
                     return event.key.code - sf::Keyboard::Num0;
+                } else {
+                    cout << "Other key pressed: " << event.key.code << endl;
                 }
             }
+            if (event.type == sf::Event::LostFocus) {
+                cout << "Window lost focus" << endl;
+            }
+            if (event.type == sf::Event::GainedFocus) {
+                cout << "Window gained focus" << endl;
+            }
+        }
+
+        // Check if the window has focus
+        if (!window.hasFocus()) {
+            cout << "Window does not have focus, requesting focus" << endl;
+            window.requestFocus();
         }
     }
+    cout << "Window is closed, returning -1" << endl;
     return -1; // Return -1 if the window is closed
 }
 
@@ -146,21 +166,17 @@ void listeArmes(sf::RenderWindow& window, sf::Font& font) {
     drawTexts(window, texts);
 }
 
-void printSfml(sf::RenderWindow& window, std::vector<std::wstring> lines){
-    sf::Font font = loadFont();
-
-    // Create text objects for each line
+void printSfml(sf::RenderWindow& window, sf::Font& font, std::vector<std::wstring> lines) {
     std::vector<sf::Text> texts;
     for (const auto& line : lines) {
         sf::Text text(line, font, 24);
         text.setFillColor(sf::Color::White);
-
         text.setString(line); // Assuming line is already in UTF-8
-        
+
         // Center the text
         sf::FloatRect textRect = text.getLocalBounds();
         text.setOrigin(textRect.width / 2, textRect.height / 2);
-        
+
         texts.push_back(text);
     }
 
@@ -169,37 +185,27 @@ void printSfml(sf::RenderWindow& window, std::vector<std::wstring> lines){
         texts[i].setPosition(window.getSize().x / 2.0f, (window.getSize().y / 3.0f) + (i * 30)); // Adjust vertical spacing
     }
 
-    // Create a clock to track elapsed time
-    sf::Clock clock;
+    window.clear();
+    for (const auto& text : texts) {
+        window.draw(text);
+    }
+    window.display();
 
-    // Main loop
+    // Wait for user input to proceed
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
                 window.close();
-        }
-
-        window.clear();
-
-        for(const auto& text : texts){
-            window.draw(text);
-        }
-
-        // Gradually reveal each line of text
-        for (size_t i = 0; i < texts.size(); ++i) {
-            if (i <= (clock.getElapsedTime().asSeconds() * 2)) { // Show one line every 2 seconds
-                window.draw(texts[i]);
+            }
+            if (event.type == sf::Event::KeyPressed) {
+                return; // Exit the function when a key is pressed
             }
         }
-
-        window.display();
     }
 }
 
-void afficheMainMenu(sf::RenderWindow& window) {
-    sf::Font font = loadFont();
-
+void afficheMainMenu(sf::RenderWindow& window, sf::Font& font) {
     // Define the text lines
     std::vector<std::wstring> lines = {
         L"       Welcome adventurer",
@@ -212,7 +218,7 @@ void afficheMainMenu(sf::RenderWindow& window) {
 
     lines.push_back(L"***********************************");
     lines.push_back(L"Votre selection: ");
-    printSfml(window, lines);
+    printSfml(window, font, lines);
 }
 
 int choixSort(sf::RenderWindow& window, sf::Font& font, Personnage p) {
@@ -333,7 +339,7 @@ void currentMana(sf::RenderWindow& window, sf::Font& font, Personnage p){
     drawTexts(window, texts);
 }
 
-void story1(sf::RenderWindow& window, int wait){
+void story1(sf::RenderWindow& window, sf::Font& font, int wait){
 
     // Define the text lines
     std::vector<std::wstring> lines = {
@@ -349,10 +355,10 @@ void story1(sf::RenderWindow& window, int wait){
         L"un scénario qui allait devenir",
         L"trop familier."
     };
-    printSfml(window, lines);
+    printSfml(window, font, lines);
 }
 
-void story2(sf::RenderWindow& window, int wait){
+void story2(sf::RenderWindow& window, sf::Font& font, int wait){
     // Define the text lines
     std::vector<std::wstring> lines = {
         L"Un jour ensoleillé,",
@@ -368,10 +374,10 @@ void story2(sf::RenderWindow& window, int wait){
         L"composée de Neuilles et de Stefun",
         L"envahit le royaume."
     };
-    printSfml(window, lines);
+    printSfml(window, font, lines);
 }
 
-void story3(sf::RenderWindow& window, int wait){
+void story3(sf::RenderWindow& window, sf::Font& font, int wait){
     std::vector<std::wstring> lines = {
         L"Alors que le chaos se déchaînait,",
         L"Bowser Jr., le nonoob originel",
@@ -384,16 +390,47 @@ void story3(sf::RenderWindow& window, int wait){
         L"la Princesse Peach fut nonoob et nojohns au château sombre de Bowser.",
         L"Merci chatgpt :p"
     };
-    printSfml(window, lines);
+    printSfml(window, font, lines);
 }
 
 void dots(sf::RenderWindow& window, sf::Font& font, int wait){
-    displayText(window, "...", font);
-    usleep(wait);
-    displayText(window, "...", font);
-    usleep(wait);
-    displayText(window, "...", font);
-    usleep(wait);
+    sf::Clock clock;
+    sf::Time elapsed;
+
+        displayText(window, ".", font);
+        clock.restart();
+        while (window.isOpen() && (elapsed = clock.getElapsedTime()).asMilliseconds() < wait) {
+            sf::Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    window.close();
+                    return;
+                }
+            }
+        }
+    
+        displayText(window, "..", font);
+        clock.restart();
+        while (window.isOpen() && (elapsed = clock.getElapsedTime()).asMilliseconds() < wait) {
+            sf::Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    window.close();
+                    return;
+                }
+            }
+        }
+        displayText(window, "...", font);
+        clock.restart();
+        while (window.isOpen() && (elapsed = clock.getElapsedTime()).asMilliseconds() < wait) {
+            sf::Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    window.close();
+                    return;
+                }
+            }
+        }
 }
 
 void beforeWarior(sf::RenderWindow& window, sf::Font& font, int wait){
@@ -403,6 +440,7 @@ void beforeWarior(sf::RenderWindow& window, sf::Font& font, int wait){
     usleep(wait);
     displayText(window, "[insert epic battle music]", font);
     usleep(wait);
+    waitForEnter(window, font);
 }
 
 void afterWarior(sf::RenderWindow& window, sf::Font& font, int wait){
@@ -419,6 +457,7 @@ void beforeYipee(sf::RenderWindow& window, sf::Font& font, int wait){
     usleep(wait);
     displayText(window, "SAUTE DESSUS! [insert epic battle music]", font);
     usleep(wait);
+    waitForEnter(window, font);
 }
 
 void afterYipee(sf::RenderWindow& window, sf::Font& font, int wait){
@@ -436,4 +475,9 @@ void afterYipee(sf::RenderWindow& window, sf::Font& font, int wait){
 
 void gainXp(sf::RenderWindow& window, sf::Font& font, int xp){
     displayText(window, "Tu as gagne " + std::to_string(xp) + "XP", font);
+}
+
+void printHero(sf::RenderWindow& window, sf::Font& font, Princeroi hero){
+    std::string displayName = "Welcome, " + std::string(hero.getNom()) + ", " + std::string(hero.getConte());
+    displayText(window, displayName, font);
 }
