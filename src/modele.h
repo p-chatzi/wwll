@@ -1,4 +1,4 @@
-#ifndef MODELE_H
+#ifndef MODELE_Hb
 #define MODELE_H
 
 #include <iostream>
@@ -152,6 +152,7 @@ class Princesse : public Personnage{
         void setFaiblesse(const char f[MAX_INPUT]){strcpy(faiblesse, f);}
         void setEtat(int e){etat = e;}
         // Methods
+        // getMonstre c'est afficher les infos de la princesse
         void getPrincesse(){ // Afficher()
             cout << "ID/Num: " << getNum() << endl;
             cout << "Nom: " << getNom() << endl;
@@ -164,7 +165,7 @@ class Princesse : public Personnage{
         }
         // void uniea(Princeroi p){}
         // void proteger(Fee f){}
-        // void attackrPar(Sorciere s){}
+        // void attaquerPar(Sorciere s){}
 };
 
 class Princeroi : public Personnage{
@@ -210,7 +211,7 @@ class Monstre : public Personnage{
     private:
         char type[MAX_INPUT];
         char couleur[MAX_INPUT];
-        // Force est redondant avec atk de Personnage 
+        // Force est redondant avec atk de Personnage
         // Mais j'utilise force pour repondre a la demande du projet
         int force; 
         bool gentil;
@@ -230,6 +231,7 @@ class Monstre : public Personnage{
             return p.getVie() - (force * map_armes[getArme()].points);
         }
 
+        // getMonstre c'est afficher les infos du monstre
         void getMonstre(){
             cout << endl;
             cout << "ID/Num: " << getNum() << endl;
