@@ -10,6 +10,10 @@ using namespace std;
 // testing branch change
 
 // Fonctions privees
+
+/*
+    Selection du personnage
+*/
 Princeroi selectionPrinceroi(){
     while(1){
     int selectionId = choixPrinceroi();
@@ -21,6 +25,7 @@ Princeroi selectionPrinceroi(){
     }
 }
 
+// Initiation des monstres
 void initWarior(Monstre& warior){
     warior.setNum(WARIOR);
     warior.setNom("Warior");
@@ -53,10 +58,18 @@ void initYipee(Monstre& yipee){
     yipee.setGentil(true);
 }
 
+/*
+    Bien qu'ici c'est du simple texte ne faisant que renommer le personnage,
+    on peut tout changer et donc laisser libre cours a notre imagination
+*/
 void evolutionChampignouf(Princeroi& p){
     p.setNom("Super champignouf");
 }
 
+/*
+    On peut faire une evolution, tranformant un personnage
+    apres qu'il ait atteint un certain level. 
+*/
 void evolve(Princeroi& p, int wait){
     if(p.getLevel() % 5 == 0){
         cout << endl << p.getNom() << " que se passe t-il?..." << endl;
@@ -69,9 +82,13 @@ void evolve(Princeroi& p, int wait){
     }
 }
 
+/*
+    Gestion du level up
+*/
 void levelUp(Princeroi& p, int gainXp, int wait){
     if((p.getXp() / 100) > p.getLevel()){
-        // Up max vie et mana et regen
+        // Augmente le max vie et max mana
+        // Regenere toute la vie et mana
         p.setLevel(p.getLevel() + 1);
         p.setMaxVie(p.getMaxVie() + 10);
         p.setMaxMana(p.getMaxMana() + 5);
@@ -84,6 +101,9 @@ void levelUp(Princeroi& p, int gainXp, int wait){
     }
 }
 
+/*
+    Applique les effets du sort sur la cible
+*/
 void appliqueSort(Sort& sort, Personnage& lanceur, Personnage& cible){
     if(sort.getType() == OFFENSIF){
         cible.setVie(cible.getVie() - sort.getDegat());
@@ -98,6 +118,9 @@ void appliqueSort(Sort& sort, Personnage& lanceur, Personnage& cible){
         cible.setVie(cible.getVie() + sort.getSoin());
 }
 
+/*
+    Gestion du choix de sort durant le tour
+*/
 bool lancerSort(Princeroi& p, Monstre& m){
     while (1) {
         // Selection d'un sort
@@ -138,6 +161,9 @@ bool lancerSort(Princeroi& p, Monstre& m){
         }
 }
 
+/*
+    Gestion du combat entre le hero et un monstre
+*/
 bool isFightWon(Princeroi& p, Monstre m, int wait){
     while(p.getVie() > 0 && m.getVie() > 0){
         currentHp(p);
@@ -182,6 +208,9 @@ bool isFightWon(Princeroi& p, Monstre m, int wait){
     return false;
 }
 
+/*
+    Gestion de l'aventure
+*/
 void debutAventure(int wait){
     Princeroi hero = selectionPrinceroi();
     cout << "Welcome, " << hero.getNom() << ", " << hero.getConte() << endl;
@@ -261,6 +290,9 @@ void debutAventure(int wait){
         return;
 }
 
+/*
+    Gestion du menu de parametres
+*/
 void settings(int* wait){
     int choix = settingsMenu();
     switch(choix){
@@ -280,7 +312,7 @@ void settings(int* wait){
 
 // Fonctions publiques
 /*
-    Affiche la liste des options
+    Gestion du menu principal
 */
 void menu(){
     while(1){
@@ -328,7 +360,6 @@ void changementArme(arme_s& a, Personnage& p){
 
 // Initiations des Personnages
 void initPeach(Princesse& peach){
-    // Princesse peach la bitch
     peach.setNum(PEACH);
     peach.setNom("Peach");
     peach.setAge(20);
@@ -336,7 +367,7 @@ void initPeach(Princesse& peach){
     peach.setMaxVie(100);
     peach.setMana(100);
     peach.setMaxMana(100);
-    peach.setConte("Princesse bitch");
+    peach.setConte("Princesse biatch");
     peach.setArme(POELE);
     peach.setFaiblesse("Bowser");
     peach.setEtat(EVEILLE);
@@ -346,7 +377,6 @@ void initPeach(Princesse& peach){
 }
 
 void initMarior(Princeroi& marior){
-    // Marior - le fake plombier
     marior.setNum(MARIOR);
     marior.setNom("Marior");
     marior.setAge(66);
@@ -366,7 +396,6 @@ void initMarior(Princeroi& marior){
 }
 
 void initLuigior(Princeroi& luigior){
-    // Luigior - le fake apprenti plombier 
     luigior.setNum(LUIGIOR);
     luigior.setNom("Luigior");
     luigior.setAge(66);
@@ -386,7 +415,6 @@ void initLuigior(Princeroi& luigior){
 }
 
 void initChampignouf(Princeroi& champignouf){
-    // Champignouf de l'extreme 
     champignouf.setNum(CHAMPIGNOUF);
     champignouf.setNom("Champignouf");
     champignouf.setAge(22);
@@ -406,7 +434,6 @@ void initChampignouf(Princeroi& champignouf){
 }
 
 void initWiwax(Princeroi& wiwax){
-    // Wiwax le chickenwiwi
     wiwax.setNum(WIWAX);
     wiwax.setNom("Wiwax");
     wiwax.setAge(20);
@@ -426,7 +453,6 @@ void initWiwax(Princeroi& wiwax){
 }
 
 void initLouloutre(Princeroi& louloutre){
-    // Louloutre la secretaire
     louloutre.setNum(LOULOUTRE);
     louloutre.setNom("Louloutre");
     louloutre.setAge(20);
@@ -446,7 +472,6 @@ void initLouloutre(Princeroi& louloutre){
 }
 
 void initSinge(Princeroi& singe){
-    // Les singes de 4tune
     singe.setNum(SINGE);
     singe.setNom("4singes");
     singe.setAge(4);
@@ -545,6 +570,7 @@ void initBaumeAppaisant(Sort& bp){
     bp.setNum(SOIN);
     bp.setNom("soin");
     bp.setCoutMana(15);
+    bp.setSoin(30);
     bp.setEstDisponible(true);
     bp.setType(SOIN);
     bp.setDescription("Medic, I need a medic!");

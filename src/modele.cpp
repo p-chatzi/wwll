@@ -1,6 +1,7 @@
 #include "modele.h"
 #include "controlleur.h"
 
+// Nom de l'arme - ID de l'arme - Degats
 arme_s map_armes[NB_ARMES] = {
     {"gros tuyeau", 0, 20},
     {"fist", 1, 10},

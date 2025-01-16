@@ -61,6 +61,9 @@ void listeArmes() {
     }
 }
 
+/*
+    Affiche le menu avec toute les options
+*/
 void afficheMainMenu() {
     cout << "       Welcome adventurer" << endl;
     ligne();
@@ -71,6 +74,9 @@ void afficheMainMenu() {
     cout << "Votre selection: ";
 }
 
+/*
+    Affiche la selection de sort
+*/
 int choixSort(Personnage p) {
     cout << "Veuillez selectionner un sort : " << endl;
     currentMana(p);
@@ -83,10 +89,10 @@ int choixSort(Personnage p) {
     cout << NO_NOOB << " - No noob" << endl;
     cout << NO_JOHNS << " - No johns" << endl;
 
-    cout << endl << "Sorts de buff : " << endl;
+    cout << endl << "Sorts de buff (fonctionalite en developpement, ne feras rien): " << endl;
     cout << PROTECTION_DIVINE << " - Protection divine" << endl;
     
-    cout << endl << "Sorts de debuff : " << endl;
+    cout << endl << "Sorts de debuff (fonctionalite en developpement, ne feras rien): " << endl;
     cout << DISPEL << " - Dispel" << endl;
     cout << SILENCE << " - Silence" << endl;
     
